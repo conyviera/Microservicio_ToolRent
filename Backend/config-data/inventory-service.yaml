@@ -6,11 +6,11 @@ eureka:
     fetch-registry: true
     register-with-eureka: true
     service-url:
-      defaultZone: http://eureka-service:8761/eureka/
+      defaultZone: http://localhost:8761/eureka/
 
 spring:
   datasource:
-    url: jdbc:postgresql://postgres-db:5432/tools_db
+    url: jdbc:postgresql://localhost:5432/tools_db
     username: postgres
     password: "09282325"
     driver-class-name: org.postgresql.Driver

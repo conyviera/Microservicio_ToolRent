@@ -1,0 +1,35 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "09282325"
+      # Crea la base de datos extra para Keycloak
+      POSTGRES_DB: toolrent_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  keycloak-service:
+    image: quay.io/keycloak/keycloak:24.0.1
+    container_name: keycloak-service
+    environment:
+      KC_DB: postgres
+      # OJO: Keycloak dentro de Docker sí usa el nombre del contenedor "postgres-db"
+      KC_DB_URL: jdbc:postgresql://postgres-db:5432/keycloak_db
+      KC_DB_USERNAME: postgres
+      KC_DB_PASSWORD: "09282325"
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+      - "8180:8080"
+    command: start-dev
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:

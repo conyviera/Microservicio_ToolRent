@@ -10,4 +10,4 @@ spring:
     config:
       server:
         native:
-          search-locations: file:/config-data
+          search-locations: file:///C:/Users/conyv/Desktop/Microservicio_ToolRent/Backend/config-data

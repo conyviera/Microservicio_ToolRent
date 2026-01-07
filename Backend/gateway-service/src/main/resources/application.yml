@@ -4,54 +4,25 @@ server:
 spring:
   application:
     name: gateway-service
-  main:
-    web-application-type: reactive
+  config:
+    import: "optional:configserver:http://localhost:8888" # Fallback local
   cloud:
-    config:
-      enabled: false
-      discovery:
-        enabled: false
     gateway:
       discovery:
         locator:
           enabled: true
           lower-case-service-id: true
-      # ⚠️ AQUÍ NO DEBE HABER NADA DE GLOBALCORS
-      routes:
-        - id: amounts-service
-          uri: lb://amounts-service
-          predicates:
-            - Path=/amounts/**
-        - id: inventory-service
-          uri: lb://inventory-service
-          predicates:
-            - Path=/tools/**
-        - id: loans-service
-          uri: lb://loans-service
-          predicates:
-            - Path=/loans/**
-        - id: customer-service
-          uri: lb://customer-service
-          predicates:
-            - Path=/customers/**
-        - id: kardex-service
-          uri: lb://kardexAndMovements-service
-          predicates:
-            - Path=/movements/**
-        - id: reports-service
-          uri: lb://reports-service
-          predicates:
-            - Path=/reports-service/**
-        - id: user-service
-          uri: lb://user-service
-          predicates:
-            - Path=/users/**
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # Esta URL debe apuntar a tu Keycloak corriendo en Docker (puerto 8180)
+          # Asegúrate de que el realm "sisgr-realm" exista en tu Keycloak
+          issuer-uri: http://localhost:8180/realms/sisgr-realm
+
 
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
-    register-with-eureka: true
-    fetch-registry: true
-  instance:
-    prefer-ip-address: true

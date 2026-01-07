@@ -32,7 +32,12 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=native
       - SPRING_CLOUD_CONFIG_SERVER_NATIVE_SEARCH_LOCATIONS=file:/config-data
-      - SERVER_PORT=8888  
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8888/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   eureka-service:
     image: eureka-service:latest
     container_name: eureka-service
@@ -54,10 +59,12 @@ services:
     environment:
       # El Gateway lee gateway-services.yaml del Config Server
       - SPRING_CONFIG_IMPORT=optional:configserver:http://config-service:8888
-      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER-URI=http://keycloak-service:8080/realms/sisgr-realm
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka/
     depends_on:
-      - eureka-service
-      - keycloak-service
+      config-service:
+        condition: service_healthy
+      eureka-service:
+        condition: service_started
     networks:
       - microservicios-net
 
