@@ -51,16 +51,14 @@ services:
     ports:
       - "8090:8090"
     environment:
+      # El Gateway lee gateway-services.yaml del Config Server
       - SPRING_CONFIG_IMPORT=optional:configserver:http://config-service:8888
-      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER-URI=http://localhost:8180/realms/sisgr-realm
-    
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER-URI=http://keycloak-service:8080/realms/sisgr-realm
     depends_on:
       - eureka-service
+      - keycloak-service
     networks:
       - microservicios-net
-    extra_hosts:
-      - "localhost:host-gateway"
-      - "host.docker.internal:host-gateway"
 
   # --- MICROSERVICIOS DE NEGOCIO ---
 
@@ -68,12 +66,8 @@ services:
     image: user-service:latest
     container_name: user-service
     environment:
+      # Solo necesita saber dónde está el Config Server. El resto lo lee de user-service.yaml
       - SPRING_CONFIG_IMPORT=optional:configserver:http://config-service:8888
-      # 👇 ESTA ES LA LÍNEA QUE ARREGLA EL "CONNECTION REFUSED" 👇
-      - SPRING_APPLICATION_JSON={"eureka":{"client":{"serviceUrl":{"defaultZone":"http://eureka-service:8761/eureka"}}}}
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/user_db
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=09282325
     depends_on:
       - postgres
       - config-service
@@ -81,18 +75,16 @@ services:
     networks:
       - microservicios-net
 
-  tool-service:
-    image: tool-service:latest
-    container_name: tool-service
+  # ⚠️ RENOMBRADO de tool-service a inventory-service (para coincidir con Gateway)
+  inventory-service:
+    image: tool-service:latest # Si no cambiaste el nombre en el pom.xml, la imagen sigue llamandose tool-service
+    container_name: inventory-service
     environment:
       - SPRING_CONFIG_IMPORT=optional:configserver:http://config-service:8888
-      # Corrección aplicada
-      - SPRING_APPLICATION_JSON={"eureka":{"client":{"serviceUrl":{"defaultZone":"http://eureka-service:8761/eureka"}}}}
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/tools_db
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=09282325
     depends_on:
       - postgres
+      - config-service
+      - eureka-service
     networks:
       - microservicios-net
 
@@ -101,11 +93,10 @@ services:
     container_name: amounts-service
     environment:
       - SPRING_CONFIG_IMPORT=optional:configserver:http://config-service:8888
-      - SPRING_APPLICATION_JSON={"eureka":{"client":{"serviceUrl":{"defaultZone":"http://eureka-service:8761/eureka"}}}}
-      # CORRECCIÓN AQUÍ:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/amountsAndFees_db
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=09282325
+    depends_on:
+      - postgres
+      - config-service
+      - eureka-service
     networks:
       - microservicios-net
 
@@ -114,37 +105,36 @@ services:
     container_name: loans-service
     environment:
       - SPRING_CONFIG_IMPORT=optional:configserver:http://config-service:8888
-      - SPRING_APPLICATION_JSON={"eureka":{"client":{"serviceUrl":{"defaultZone":"http://eureka-service:8761/eureka"}}}}
-      # CORRECCIÓN AQUÍ:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/loans
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=09282325
+    depends_on:
+      - postgres
+      - config-service
+      - eureka-service
     networks:
       - microservicios-net
 
+  # ⚠️ OJO: En el Gateway pusiste 'kardexAndMovements-service'. Aquí el nombre del servicio Docker puede ser corto.
   kardex-service:
     image: kardex-service:latest
     container_name: kardex-service
     environment:
       - SPRING_CONFIG_IMPORT=optional:configserver:http://config-service:8888
-      # Corrección aplicada
-      - SPRING_APPLICATION_JSON={"eureka":{"client":{"serviceUrl":{"defaultZone":"http://eureka-service:8761/eureka"}}}}
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/kardex_db
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=09282325
+    depends_on:
+      - postgres
+      - config-service
+      - eureka-service
     networks:
       - microservicios-net
 
-  customers-service:
-    image: customers-service:latest
-    container_name: customers-service
+  # ⚠️ RENOMBRADO de customers-service a customer-service (Singular, para coincidir con todo)
+  customer-service:
+    image: customers-service:latest # Mantén el nombre de imagen que generaste
+    container_name: customer-service
     environment:
       - SPRING_CONFIG_IMPORT=optional:configserver:http://config-service:8888
-      # Corrección aplicada
-      - SPRING_APPLICATION_JSON={"eureka":{"client":{"serviceUrl":{"defaultZone":"http://eureka-service:8761/eureka"}}}}
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/customer_db
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=09282325
+    depends_on:
+      - postgres
+      - config-service
+      - eureka-service
     networks:
       - microservicios-net
 
@@ -153,11 +143,10 @@ services:
     container_name: reports-service
     environment:
       - SPRING_CONFIG_IMPORT=optional:configserver:http://config-service:8888
-      # Corrección aplicada
-      - SPRING_APPLICATION_JSON={"eureka":{"client":{"serviceUrl":{"defaultZone":"http://eureka-service:8761/eureka"}}}}
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/reports_db
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=09282325
+    depends_on:
+      - postgres
+      - config-service
+      - eureka-service
     networks:
       - microservicios-net
 
