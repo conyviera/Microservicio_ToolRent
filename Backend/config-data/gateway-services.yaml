@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8090 # El puerto externo del container
 
 eureka:
   client:
@@ -8,13 +8,31 @@ eureka:
     service-url:
       defaultZone: http://eureka-service:8761/eureka/
 
-
 spring:
   cloud:
     gateway:
       discovery:
         locator:
           enabled: true
+          lower-case-service-id: true
+
+      # ✅ ESTA ES LA MAGIA PARA CORS (Adaptado a tu local)
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:5173" # Tu Frontend React
+              - "http://localhost:3000" # Por si acaso
+            allowedMethods:
+              - "GET"
+              - "POST"
+              - "PUT"
+              - "DELETE"
+              - "OPTIONS"
+              - "PATCH"
+            allowedHeaders: "*"
+            allowCredentials: true
+
       routes:
         - id: amounts-service
           uri: lb://amounts-service
@@ -33,13 +51,13 @@ spring:
           predicates:
             - Path=/customers/**
         - id: kardex-service
-          uri: lb://kardexAndMovements-service
+          uri: lb://kardexAndMovements-service # Recuerda renombrar tu bootstrap.yaml o el id aquí
           predicates:
             - Path=/movements/**
         - id: reports-service
           uri: lb://reports-service
           predicates:
-            - Path=/reports-service/**
+            - Path=/reports-service/** # Ojo con el path, a veces es solo /reports/**
         - id: user-service
           uri: lb://user-service
           predicates:
