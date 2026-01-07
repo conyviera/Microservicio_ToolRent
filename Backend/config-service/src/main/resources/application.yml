@@ -1,13 +1,13 @@
 server:
-  port: 0
+  port: 8888 
 
 spring:
   application:
     name: config-service
   profiles:
-    active: native # para sacar el archivo del PC
+    active: native
   cloud:
     config:
       server:
         native:
-          search-locations: file:./config-data
+          search-locations: file:/config-data

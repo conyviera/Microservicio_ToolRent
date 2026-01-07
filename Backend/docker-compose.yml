@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # --- INFRAESTRUCTURA ---
 
@@ -29,9 +27,12 @@ services:
       - "8888:8888"
     networks:
       - microservicios-net
+    volumes:
+      - ./config-data:/config-data
     environment:
       - SPRING_PROFILES_ACTIVE=native
-
+      - SPRING_CLOUD_CONFIG_SERVER_NATIVE_SEARCH_LOCATIONS=file:/config-data
+      - SERVER_PORT=8888  
   eureka-service:
     image: eureka-service:latest
     container_name: eureka-service
@@ -66,7 +67,7 @@ services:
     image: user-service:latest
     container_name: user-service
     environment:
-      # Solo necesita saber dónde está el Config Server. El resto lo lee de user-service.yaml
+      - SPRING_CLOUD_CONFIG_URI=http://config-service:8888
       - SPRING_CONFIG_IMPORT=optional:configserver:http://config-service:8888
     depends_on:
       - postgres
@@ -80,6 +81,7 @@ services:
     image: tool-service:latest # Si no cambiaste el nombre en el pom.xml, la imagen sigue llamandose tool-service
     container_name: inventory-service
     environment:
+      - SPRING_CLOUD_CONFIG_URI=http://config-service:8888
       - SPRING_CONFIG_IMPORT=optional:configserver:http://config-service:8888
     depends_on:
       - postgres
@@ -92,6 +94,7 @@ services:
     image: amounts-service:latest
     container_name: amounts-service
     environment:
+      - SPRING_CLOUD_CONFIG_URI=http://config-service:8888
       - SPRING_CONFIG_IMPORT=optional:configserver:http://config-service:8888
     depends_on:
       - postgres
@@ -104,6 +107,7 @@ services:
     image: loans-service:latest
     container_name: loans-service
     environment:
+      - SPRING_CLOUD_CONFIG_URI=http://config-service:8888
       - SPRING_CONFIG_IMPORT=optional:configserver:http://config-service:8888
     depends_on:
       - postgres
@@ -117,6 +121,7 @@ services:
     image: kardex-service:latest
     container_name: kardex-service
     environment:
+      - SPRING_CLOUD_CONFIG_URI=http://config-service:8888
       - SPRING_CONFIG_IMPORT=optional:configserver:http://config-service:8888
     depends_on:
       - postgres
@@ -130,6 +135,7 @@ services:
     image: customers-service:latest # Mantén el nombre de imagen que generaste
     container_name: customer-service
     environment:
+      - SPRING_CLOUD_CONFIG_URI=http://config-service:8888
       - SPRING_CONFIG_IMPORT=optional:configserver:http://config-service:8888
     depends_on:
       - postgres
@@ -142,6 +148,7 @@ services:
     image: reports-service:latest
     container_name: reports-service
     environment:
+      - SPRING_CLOUD_CONFIG_URI=http://config-service:8888
       - SPRING_CONFIG_IMPORT=optional:configserver:http://config-service:8888
     depends_on:
       - postgres
