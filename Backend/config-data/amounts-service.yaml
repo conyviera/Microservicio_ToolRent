@@ -11,7 +11,7 @@ eureka:
 spring:
   datasource:
 
-    url: jdbc:postgresql://postgres-db:5432/customer_db
+    url: jdbc:postgresql://postgres-db:5432/amountsAndFees_db
     username: postgres
     password: "09282325"
     driver-class-name: org.postgresql.Driver

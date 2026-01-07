@@ -6,9 +6,8 @@ eureka:
     fetch-registry: true
     register-with-eureka: true
     service-url:
-      defaultZone: http://localhost:8761/eureka/
-  instance:
-    hostname: localhost
+      defaultZone: http://eureka-service:8761/eureka/
+
 
 spring:
   cloud:
@@ -17,7 +16,31 @@ spring:
         locator:
           enabled: true
       routes:
-        - id: tool-service
-          uri: lb://tool-service  # "lb" significa Load Balancer (Balanceo de carga usando Eureka)
+        - id: amounts-service
+          uri: lb://amounts-service
           predicates:
-            - Path=/tool/** # Si escribes localhost:8080/tool/..., te lleva a tool-service
+            - Path=/amounts/**
+        - id: inventory-service
+          uri: lb://inventory-service
+          predicates:
+            - Path=/tools/**
+        - id: loans-service
+          uri: lb://loans-service
+          predicates:
+            - Path=/loans/**
+        - id: customer-service
+          uri: lb://customer-service
+          predicates:
+            - Path=/customers/**
+        - id: kardex-service
+          uri: lb://kardexAndMovements-service
+          predicates:
+            - Path=/movements/**
+        - id: reports-service
+          uri: lb://reports-service
+          predicates:
+            - Path=/reports-service/**
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/users/**
