@@ -1,0 +1,8 @@
+CREATE DATABASE "amountsAndFees_db";
+CREATE DATABASE customer_db;
+CREATE DATABASE kardex_db;
+CREATE DATABASE loans;
+CREATE DATABASE reports;
+CREATE DATABASE tools_db;
+CREATE DATABASE user_db;
+CREATE DATABASE keycloak_db;

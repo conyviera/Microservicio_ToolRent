@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/amountsAndFees-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/amountsAndFees-services/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/config-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/customers-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/eureka-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/eureka-service/src/main/resources/bootstrap.yaml" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gateway-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gateway-service/src/main/resources/application.yml" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/kardexAndMovements-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/loansAndRefunds-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/reportsAndQueries-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/tool-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/user-service/src/main/java" charset="UTF-8" />
+  </component>
+</project>

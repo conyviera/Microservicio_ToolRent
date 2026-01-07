@@ -1,0 +1,187 @@
+version: '3.8'
+
+services:
+  # --- INFRAESTRUCTURA ---
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "09282325"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - microservicios-net
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+
+  config-service:
+    image: config-service:latest
+    container_name: config-service
+    ports:
+      - "8888:8888"
+    networks:
+      - microservicios-net
+    environment:
+      - SPRING_PROFILES_ACTIVE=native
+
+  eureka-service:
+    image: eureka-service:latest
+    container_name: eureka-service
+    ports:
+      - "8761:8761"
+    environment:
+      - EUREKA_CLIENT_REGISTERWITHUREKA=false
+      - EUREKA_CLIENT_FETCHREGISTRY=false
+    depends_on:
+      - config-service
+    networks:
+      - microservicios-net
+
+  gateway-service:
+    image: gateway-service:latest
+    container_name: gateway-service
+    ports:
+      - "8090:8090"
+    environment:
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-service:8888
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER-URI=http://localhost:8180/realms/sisgr-realm
+    
+    depends_on:
+      - eureka-service
+    networks:
+      - microservicios-net
+    extra_hosts:
+      - "localhost:host-gateway"
+      - "host.docker.internal:host-gateway"
+
+  # --- MICROSERVICIOS DE NEGOCIO ---
+
+  user-service:
+    image: user-service:latest
+    container_name: user-service
+    environment:
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-service:8888
+      # 👇 ESTA ES LA LÍNEA QUE ARREGLA EL "CONNECTION REFUSED" 👇
+      - SPRING_APPLICATION_JSON={"eureka":{"client":{"serviceUrl":{"defaultZone":"http://eureka-service:8761/eureka"}}}}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/user_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=09282325
+    depends_on:
+      - postgres
+      - config-service
+      - eureka-service
+    networks:
+      - microservicios-net
+
+  tool-service:
+    image: tool-service:latest
+    container_name: tool-service
+    environment:
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-service:8888
+      # Corrección aplicada
+      - SPRING_APPLICATION_JSON={"eureka":{"client":{"serviceUrl":{"defaultZone":"http://eureka-service:8761/eureka"}}}}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/tools_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=09282325
+    depends_on:
+      - postgres
+    networks:
+      - microservicios-net
+
+  amounts-service:
+    image: amounts-service:latest
+    container_name: amounts-service
+    environment:
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-service:8888
+      - SPRING_APPLICATION_JSON={"eureka":{"client":{"serviceUrl":{"defaultZone":"http://eureka-service:8761/eureka"}}}}
+      # CORRECCIÓN AQUÍ:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/amountsAndFees_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=09282325
+    networks:
+      - microservicios-net
+
+  loans-service:
+    image: loans-service:latest
+    container_name: loans-service
+    environment:
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-service:8888
+      - SPRING_APPLICATION_JSON={"eureka":{"client":{"serviceUrl":{"defaultZone":"http://eureka-service:8761/eureka"}}}}
+      # CORRECCIÓN AQUÍ:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/loans
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=09282325
+    networks:
+      - microservicios-net
+
+  kardex-service:
+    image: kardex-service:latest
+    container_name: kardex-service
+    environment:
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-service:8888
+      # Corrección aplicada
+      - SPRING_APPLICATION_JSON={"eureka":{"client":{"serviceUrl":{"defaultZone":"http://eureka-service:8761/eureka"}}}}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/kardex_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=09282325
+    networks:
+      - microservicios-net
+
+  customers-service:
+    image: customers-service:latest
+    container_name: customers-service
+    environment:
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-service:8888
+      # Corrección aplicada
+      - SPRING_APPLICATION_JSON={"eureka":{"client":{"serviceUrl":{"defaultZone":"http://eureka-service:8761/eureka"}}}}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/customer_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=09282325
+    networks:
+      - microservicios-net
+
+  reports-service:
+    image: reports-service:latest
+    container_name: reports-service
+    environment:
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-service:8888
+      # Corrección aplicada
+      - SPRING_APPLICATION_JSON={"eureka":{"client":{"serviceUrl":{"defaultZone":"http://eureka-service:8761/eureka"}}}}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/reports_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=09282325
+    networks:
+      - microservicios-net
+
+  keycloak-service:
+    image: quay.io/keycloak/keycloak:24.0.1
+    container_name: keycloak-service
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres-db:5432/keycloak_db
+      KC_DB_USERNAME: postgres
+      KC_DB_PASSWORD: "09282325"
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+      - "8180:8080"
+    command: start-dev
+    depends_on:
+      - postgres
+    networks:
+      - microservicios-net
+
+networks:
+  microservicios-net:
+    driver: bridge
+
+volumes:
+  postgres_data:
