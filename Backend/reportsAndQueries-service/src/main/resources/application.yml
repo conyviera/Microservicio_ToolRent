@@ -1,6 +1,11 @@
+server:
+  port: 0
+
 spring:
   application:
-    name: reports-service
+    name: reports-service  # Debe coincidir con el archivo en config-data/reports-service.yaml
   config:
-
     import: "optional:configserver:http://localhost:8888/"
+  cloud:
+    config:
+      fail-fast: false

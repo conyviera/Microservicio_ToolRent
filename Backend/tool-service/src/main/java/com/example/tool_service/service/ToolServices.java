@@ -124,19 +124,13 @@ public class ToolServices {
      * @param idTypeTool
      * @return
      */
-
     public List<ToolEntity> findAllByTypeTool(Long idTypeTool) {
 
-        Optional<TypeToolEntity> typeToolOptional = typeToolRepo.findById(idTypeTool);
-
-        if (typeToolOptional.isEmpty()) {
+        // Verificamos si existe el tipo (opcional, pero buena práctica)
+        if (!typeToolRepo.existsById(idTypeTool)) {
             throw new EntityNotFoundException("El Tipo de Herramienta con ID " + idTypeTool + " no existe.");
         }
 
-        TypeToolEntity typeTool = typeToolOptional.get();
-
-        List<ToolEntity> tools = toolRepo.findAllByTypeTool(typeTool);
-
-        return tools;
+        return toolRepo.findAllByIdtypeTool(idTypeTool);
     }
 }

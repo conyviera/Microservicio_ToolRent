@@ -44,7 +44,8 @@ public class DebtsEntity {
     private Long idCustomer;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private LoanEntity Loan;
+    @JoinColumn(name = "id_loan")
+    private LoanEntity loan;
 
     private List<Long> idTools;
 
