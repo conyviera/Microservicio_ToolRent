@@ -2,6 +2,7 @@ package com.example.tool_service.controller;
 
 import com.example.tool_service.entity.ToolEntity;
 import com.example.tool_service.entity.TypeToolEntity;
+import com.example.tool_service.model.TypeToolResponse;
 import com.example.tool_service.repository.ToolRepository;
 import com.example.tool_service.service.ToolServices;
 import com.example.tool_service.service.TypeToolServices;
@@ -143,8 +144,8 @@ public class ToolController {
      */
     @GetMapping("/getAllTypeTools")
     //@PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    public ResponseEntity<List<TypeToolEntity>> getAllTool(){
-        return ResponseEntity.ok(typeToolService.getAllTypeTools());
+    public ResponseEntity<List<TypeToolResponse>> getAllTool(){
+        return ResponseEntity.ok(typeToolService.getAllTypeToolsWithAmounts());
     }
 
     /**

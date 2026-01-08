@@ -12,6 +12,8 @@ public interface CustomerRepository extends JpaRepository<CustomerEntity,Long> {
 
     Optional<CustomerEntity> findByRut(String rut);
 
+
+
     @Override
     List<CustomerEntity> findAll();
 

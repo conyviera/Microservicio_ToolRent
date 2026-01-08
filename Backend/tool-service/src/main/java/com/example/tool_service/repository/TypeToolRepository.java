@@ -16,4 +16,6 @@ public interface TypeToolRepository extends JpaRepository<TypeToolEntity,Long>{
     @Query("select distinct t.category from TypeToolEntity t")
     List<String> findDistinctCategory();
 
+    @Query("SELECT COUNT(t) FROM ToolEntity t WHERE t.idtypeTool = :id AND t.state = 'AVAILABLE'")
+    int countAvailableTools(Long id);
 }

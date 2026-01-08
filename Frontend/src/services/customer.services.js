@@ -1,6 +1,6 @@
 import httpClient from './http-common.js';
 
-const PREFIX = '/customers-service';
+const PREFIX = '/customer-service';
 
 const createCustomer = async (customer) => {
     return httpClient.post(`${PREFIX}/customers/register`, customer);

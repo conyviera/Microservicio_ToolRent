@@ -1,6 +1,7 @@
 package com.example.customers_service.controller;
 
 import com.example.customers_service.entity.CustomerEntity;
+import com.example.customers_service.repository.CustomerRepository;
 import com.example.customers_service.service.CustomerService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.ResponseEntity;
@@ -13,9 +14,11 @@ import java.util.List;
 public class CustomerController {
 
     private final CustomerService customerService;
+    private final CustomerRepository customerRepository;
 
-    public CustomerController(CustomerService customerService) {
+    public CustomerController(CustomerService customerService, CustomerRepository customerRepository) {
         this.customerService = customerService;
+        this.customerRepository = customerRepository;
     }
 
     // RF3.1: Registrar (Ahora maneja tus validaciones)
@@ -65,5 +68,11 @@ public class CustomerController {
         } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    // Endpoint para comunicación interna con Loans-Service
+    @GetMapping("/{id}")
+    public ResponseEntity<CustomerEntity> getCustomerById(@PathVariable Long id) {
+        return customerService.getCustomerById(id);
     }
 }

@@ -28,7 +28,7 @@ function AddLoanForm({ onLoanAdded }) {
   const [typeToolIds, setTypeToolIds] = useState([]); 
   const [typeTool, setTypeTool] = useState([]); 
   
-  const [customerId, setCustomerId] = useState('');
+  const [customerRut, setCustomerRut] = useState('');
   const [deliveryDate, setDeliveryDate] = useState('');
   const [returnDate, setReturnDate] = useState('');
 
@@ -54,7 +54,7 @@ function AddLoanForm({ onLoanAdded }) {
 
   const clearForm = () => {
     setTypeToolIds([]);
-    setCustomerId('');
+    setCustomerRut('');
     setDeliveryDate('');
     setReturnDate('');
     setCalculatedAmount(null);
@@ -100,7 +100,7 @@ function AddLoanForm({ onLoanAdded }) {
 
     const loanData = {
       typeToolIds: typeToolIds,
-      customerId: parseInt(customerId, 10),
+      customerRut: customerRut,
       deliveryDate: deliveryDate,
       returnDate: returnDate
     };
@@ -181,16 +181,16 @@ function AddLoanForm({ onLoanAdded }) {
         <br />
 
         <label>
-          ID del Cliente:
+          Rut del Cliente:
           <input
             className="input-style"
-            placeholder="Ej: 1"
-            type="number"
-            value={customerId}
+            placeholder="Ej: 12345678-9"
+            type="text"
+            value={customerRut}
             onChange={(e) => {
                 const value = e.target.value;
               if (value === '' || Number(value) >= 0) {
-                setCustomerId(value);
+                setCustomerRut(value);
               }
             }}
           />

@@ -8,6 +8,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import com.example.loansAndRefunds_service.model.LoanResponse;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -267,5 +268,47 @@ public class LoanService {
         }
 
         return totalRentalAmount;
+    }
+
+    // Asegúrate de importar LoanResponse y ArrayList
+
+    public List<LoanResponse> getAllLoansWithDetails() {
+        List<LoanEntity> loans = loanRepo.findAll();
+        List<LoanResponse> responseList = new ArrayList<>();
+
+        for (LoanEntity loan : loans) {
+            // 1. Obtener Cliente (Aggregation)
+            Customer customerObj = new Customer();
+            try {
+                // Buscamos el cliente por ID en el microservicio de clientes
+                customerObj = restTemplate.getForObject(
+                        "http://customer-service/customers/" + loan.getIdCustomer(),
+                        Customer.class
+                );
+            } catch (Exception e) {
+                // Si falla, ponemos datos dummy para que el frontend no se rompa
+                customerObj.setId(loan.getIdCustomer());
+                customerObj.setName("Desconocido (Error conexión)");
+            }
+
+            // 2. Obtener Herramientas (Opcional por ahora para no complicar)
+            // Para que el frontend no falle con "loan.tool.map", enviamos una lista vacía o parcial
+            List<Tool> toolList = new ArrayList<>();
+            // (Aquí podrías hacer otro bucle para buscar los nombres de las herramientas en inventory-service)
+
+            // 3. Construir respuesta
+            LoanResponse dto = new LoanResponse();
+            dto.setIdLoan(loan.getIdLoan());
+            dto.setCustomer(customerObj); // <--- ESTO ARREGLA EL ERROR DEL FRONTEND
+            dto.setTool(toolList);
+            dto.setDeliveryDate(loan.getDeliveryDate());
+            dto.setReturnDate(loan.getReturnDate());
+            dto.setRentalAmount(loan.getRentalAmount());
+            dto.setState(loan.getState());
+
+            responseList.add(dto);
+        }
+
+        return responseList;
     }
 }

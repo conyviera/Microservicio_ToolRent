@@ -2,6 +2,7 @@ package com.example.loansAndRefunds_service.controller;
 
 import com.example.loansAndRefunds_service.entity.LoanEntity;
 import com.example.loansAndRefunds_service.model.Loan;
+import com.example.loansAndRefunds_service.model.LoanResponse;
 import com.example.loansAndRefunds_service.repository.LoanRepository;
 import com.example.loansAndRefunds_service.service.LoanService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,11 +99,11 @@ public class LoanController {
         }
     }
 
+    // Cambia el tipo de retorno de LoanEntity a LoanResponse
     @GetMapping("/getAllLoans")
-    public ResponseEntity<List<LoanEntity>> getAllLoans(){
-
-        List<LoanEntity> loans= loanRepo.findAll();
-
+    public ResponseEntity<List<LoanResponse>> getAllLoans(){
+        // Usamos el nuevo método con detalles
+        List<LoanResponse> loans = loanService.getAllLoansWithDetails();
         return ResponseEntity.ok(loans);
     }
 
