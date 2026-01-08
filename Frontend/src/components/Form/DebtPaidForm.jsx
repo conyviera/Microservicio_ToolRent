@@ -1,5 +1,6 @@
-import React, {useState} from 'react';
-import loanService from '../../services/loan.services.js';
+import React, { useState } from 'react';
+// CAMBIO IMPORTANTE: Importar debtsServices en lugar de loanService
+import debtsServices from '../../services/debts.services.js'; 
 
 function DebtPaidForm({debt, onDebtPaid}){
     const [amountPaid, setAmountPaid]= useState('');
@@ -10,11 +11,12 @@ function DebtPaidForm({debt, onDebtPaid}){
 
     const handleSubmit= async (e)=>{
         e.preventDefault();
-        const isConfirmed = window.confirm("Confirma que deseas pagar esta deuda?");
+        const isConfirmed = window.confirm("¿Confirma que deseas pagar esta deuda?");
         
         if (isConfirmed) {
             try {
-                await loanService.payDebt(debt.idDebts);
+                // CAMBIO: Usar debtsServices
+                await debtsServices.payDebt(debt.idDebts);
                 alert("¡Deuda pagada con éxito!");
                 onDebtPaid();
             } catch (error) {

@@ -5,6 +5,7 @@ import com.example.loansAndRefunds_service.model.Loan;
 import com.example.loansAndRefunds_service.model.LoanResponse;
 import com.example.loansAndRefunds_service.repository.LoanRepository;
 import com.example.loansAndRefunds_service.service.LoanService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -85,17 +86,15 @@ public class LoanController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<LoanEntity> getLoanById(@PathVariable("id") Long loanId) {
-        // Buscamos el préstamo en la base de datos usando el repositorio
-        Optional<LoanEntity> loanOptional = loanRepo.findById(loanId);
-
-        // Verificamos si el préstamo fue encontrado
-        if (loanOptional.isPresent()) {
-            // Si existe, lo devolvemos con un estado 200 OK
-            return ResponseEntity.ok(loanOptional.get());
-        } else {
-            // Si no existe, devolvemos un estado 404 Not Found
+    public ResponseEntity<LoanResponse> getLoanById(@PathVariable("id") Long loanId) {
+        try {
+            // Usamos el nuevo método que devuelve el DTO completo
+            LoanResponse loan = loanService.getLoanByIdWithDetails(loanId);
+            return ResponseEntity.ok(loan);
+        } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
         }
     }
 

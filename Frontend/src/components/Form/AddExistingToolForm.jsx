@@ -28,7 +28,7 @@ function AddExistingToolForm({typeTool, onToolAdded}){
           replacementValue: typeTool.replacementValue,
           dailyRate: typeTool.dailyRate,
           debtRate: typeTool.debtRate,
-          quantity: parseInt(quantity,10)
+          amount: numQuantity
          };
     
         try {

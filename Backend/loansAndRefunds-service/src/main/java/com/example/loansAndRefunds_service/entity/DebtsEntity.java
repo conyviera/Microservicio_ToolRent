@@ -47,6 +47,7 @@ public class DebtsEntity {
     @JoinColumn(name = "id_loan")
     private LoanEntity loan;
 
+    @ElementCollection
     private List<Long> idTools;
 
 

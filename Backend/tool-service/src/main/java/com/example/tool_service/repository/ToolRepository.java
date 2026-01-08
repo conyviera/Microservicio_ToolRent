@@ -19,4 +19,6 @@ public interface ToolRepository extends JpaRepository<ToolEntity,Long> {
     Optional<ToolEntity> findFirstByIdtypeToolAndState (Long typeToolId, String state);
 
     List<ToolEntity> findAllByIdtypeTool(Long idtypeTool);
+
+    int countByIdtypeToolAndState(Long idtypeTool, String state);
 }

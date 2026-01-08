@@ -7,10 +7,13 @@ const createLoan = async (loan) => {
     return httpClient.post(`${PREFIX}/loans/create`, loan);
 };
 
-//Función para devolver un préstamo LISTO
-const returnLoan = async (id, data) => {
-    return httpClient.put(`${PREFIX}/loans/return`, data);
-
+const returnLoan = (loanId, payload) => {
+    // Combinamos el ID y el mapa de estados
+    const data = {
+        loanId: loanId,
+        toolStates: payload.toolStates
+    };
+    return httpClient.post('/loans-service/loans/return', data);
 };
 
 //Función que trae un préstamo por su id LISTO

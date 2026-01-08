@@ -11,7 +11,6 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import Chip from '@mui/material/Chip';
-import Button from '@mui/material/Button';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -28,7 +27,9 @@ function AddLoanForm({ onLoanAdded }) {
   const [typeToolIds, setTypeToolIds] = useState([]); 
   const [typeTool, setTypeTool] = useState([]); 
   
-  const [customerRut, setCustomerRut] = useState('');
+  // CAMBIO 1: Usamos 'customerRut' (string) en lugar de 'customerId'
+  const [customerRut, setCustomerRut] = useState(''); 
+  
   const [deliveryDate, setDeliveryDate] = useState('');
   const [returnDate, setReturnDate] = useState('');
 
@@ -54,13 +55,12 @@ function AddLoanForm({ onLoanAdded }) {
 
   const clearForm = () => {
     setTypeToolIds([]);
-    setCustomerRut('');
+    setCustomerRut(''); // CAMBIO 2: Limpiamos el RUT
     setDeliveryDate('');
     setReturnDate('');
     setCalculatedAmount(null);
   };
 
-  // Funcion que calcula el monto del prestamo 
   const handleCalculateTotal = async () => {
     if (typeToolIds.length === 0 || !deliveryDate || !returnDate) {
         alert("Selecciona herramientas y fechas para calcular.");
@@ -98,9 +98,10 @@ function AddLoanForm({ onLoanAdded }) {
       return;
     }
 
+    // CAMBIO 3: Estructura del objeto CORRECTA para el Backend (Loan.java)
     const loanData = {
       typeToolIds: typeToolIds,
-      customerRut: customerRut,
+      customerRut: customerRut, // Enviamos el RUT como string
       deliveryDate: deliveryDate,
       returnDate: returnDate
     };
@@ -123,19 +124,16 @@ function AddLoanForm({ onLoanAdded }) {
     }
   };
 
-  // Helper para obtener el nombre de la herramienta por su ID
   const getToolNameById = (id) => {
     const tool = typeTool.find(t => t.idTypeTool === id);
     return tool ? tool.name : id;
   };
 
-  // Helper para formatear dinero (CLP o USD según tu preferencia)
   const formatMoney = (amount) => {
     return new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(amount);
   };
 
   return (
-    // CORRECCIÓN SCROLL: Aseguramos que el contenedor permita scroll si es muy alto
     <div className="form-container" style={{ overflowY: 'auto', maxHeight: '100vh', padding: '20px' }}>
       <form className="form-data" onSubmit={handleSubmit}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -155,8 +153,6 @@ function AddLoanForm({ onLoanAdded }) {
               value={typeToolIds}
               onChange={handleSelectChange}
               input={<OutlinedInput id="select-multiple-chip" label="Herramientas" />}
-              
-              
               renderValue={(selected) => (
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                   {selected.map((value) => (
@@ -180,19 +176,15 @@ function AddLoanForm({ onLoanAdded }) {
         
         <br />
 
+        {/* CAMBIO 4: Input para RUT en lugar de ID */}
         <label>
-          Rut del Cliente:
+          RUT del Cliente:
           <input
             className="input-style"
-            placeholder="Ej: 12345678-9"
-            type="text"
+            placeholder="Ej: 12.345.678-9"
+            type="text" 
             value={customerRut}
-            onChange={(e) => {
-                const value = e.target.value;
-              if (value === '' || Number(value) >= 0) {
-                setCustomerRut(value);
-              }
-            }}
+            onChange={(e) => setCustomerRut(e.target.value)}
           />
         </label>
         
