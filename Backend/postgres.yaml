@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-db
+spec:
+  ports:
+    - port: 5432
+  selector:
+    app: postgres
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+spec:
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:15-alpine
+          env:
+            - name: POSTGRES_USER
+              value: "postgres"
+            - name: POSTGRES_PASSWORD
+              value: "09282325" # Según tu docker-compose
+          ports:
+            - containerPort: 5432
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "1.0"
+          volumeMounts:
+            - name: init-script
+              mountPath: /docker-entrypoint-initdb.d/init.sql
+              subPath: init.sql
+      volumes:
+        - name: init-script
+          configMap:
+            name: postgres-init-script

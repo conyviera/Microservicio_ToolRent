@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: loans-service
+spec:
+  selector:
+    app: loans-service
+  ports:
+    - protocol: TCP
+      port: 8085
+      targetPort: 0 # Soporte para asignación dinámica
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loans-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: loans-service
+  template:
+    metadata:
+      labels:
+        app: loans-service
+    spec:
+      containers:
+        - name: loans-service
+          image: loans-service:latest
+          imagePullPolicy: Never
+          env:
+            - name: SERVER_PORT
+              value: "0" # REQUISITO RÚBRICA: Puerto dinámico
+            - name: SPRING_CONFIG_IMPORT
+              value: "optional:configserver:http://config-service:8888"
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              value: "http://eureka-service:8761/eureka/"
+            # CONEXIÓN EXCLUSIVA A LA DB loans (Punto 2 Rúbrica)
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:postgresql://postgres-db:5432/loans"
+            - name: SPRING_DATASOURCE_USERNAME
+              value: "postgres"
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: "09282325"

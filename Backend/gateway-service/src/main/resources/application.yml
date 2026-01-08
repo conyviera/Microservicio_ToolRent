@@ -5,7 +5,7 @@ spring:
   application:
     name: gateway-service
   config:
-    import: "optional:configserver:http://localhost:8888" # Fallback local
+    import: "optional:configserver:http://config-service:8888"
   cloud:
     gateway:
       discovery:
@@ -13,16 +13,15 @@ spring:
           enabled: true
           lower-case-service-id: true
 
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          # Esta URL debe apuntar a tu Keycloak corriendo en Docker (puerto 8180)
-          # Asegúrate de que el realm "sisgr-realm" exista en tu Keycloak
-          issuer-uri: http://localhost:8180/realms/sisgr-realm
 
+#  security:
+#    oauth2:
+#      resourceserver:
+#        jwt:
+#          issuer-uri: http://localhost:8180/realms/sisgr-realm
 
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      # IMPORTANTE: En K8s usa el nombre del servicio, no localhost
+      defaultZone: http://eureka-service:8761/eureka/

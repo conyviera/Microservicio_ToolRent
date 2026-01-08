@@ -1,12 +1,13 @@
 import axios from "axios";
 import keycloak from "./keycloak";
 
-const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8090';
-console.log("Conectando a:", baseURL);
+const baseURL = 'http://192.168.49.2:30090'; 
+
+console.log("Conectando a API Gateway en Kubernetes:", baseURL);
 
 const httpClient = axios.create({
   baseURL: baseURL,
-  withCredentials: true,  // ✅ IMPORTANTE para enviar credentials
+  withCredentials: true,
   headers: {
     "Content-Type": "application/json"
   }

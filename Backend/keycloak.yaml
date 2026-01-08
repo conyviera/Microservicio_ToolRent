@@ -1,0 +1,98 @@
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: keycloak
+  labels:
+    app: keycloak
+spec:
+  serviceName: "keycloak-service"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: keycloak
+  template:
+    metadata:
+      labels:
+        app: keycloak
+    spec:
+      containers:
+      - name: keycloak
+        # Versión estable 
+        image: quay.io/keycloak/keycloak:21.1.1
+        imagePullPolicy: IfNotPresent
+       
+        args: ["start-dev", "--http-port=9090"]
+        ports:
+        - containerPort: 9090
+          name: http
+        env:
+        - name: KEYCLOAK_ADMIN
+          value: "admin"
+        - name: KEYCLOAK_ADMIN_PASSWORD
+          value: "admin"
+        - name: KC_DB
+          value: "postgres"
+        - name: KC_DB_URL
+          value: "jdbc:postgresql://postgres-db:5432/keycloak_db"
+        - name: KC_DB_USERNAME
+          value: "postgres"
+        - name: KC_DB_PASSWORD
+          value: "09282325"
+        # Proxy configuration 
+        - name: KC_PROXY
+          value: "edge"
+        
+        - name: KC_HOSTNAME_URL
+          value: "http://192.168.49.2:31000"
+        resources:
+          requests:
+            memory: "400Mi" # Bajamos de 512 a 400
+          limits:
+            memory: "800Mi"  # Bajamos de 1024 a 800
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 9090
+          initialDelaySeconds: 120
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 9090
+          initialDelaySeconds: 60
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        volumeMounts:
+        - name: keycloak-data
+          mountPath: /opt/keycloak/data
+  volumeClaimTemplates:
+  - metadata:
+      name: keycloak-data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 2Gi
+
+---
+# Service: Exposición de Keycloak via NodePort
+apiVersion: v1
+kind: Service
+metadata:
+  name: keycloak-service
+  labels:
+    app: keycloak
+spec:
+  type: NodePort
+  selector:
+    app: keycloak
+  ports:
+  - port: 9090
+    targetPort: 9090
+    nodePort: 31000
+    protocol: TCP
+    name: http

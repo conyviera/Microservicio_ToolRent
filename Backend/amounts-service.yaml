@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: amounts-service
+spec:
+  selector:
+    app: amounts-service
+  ports:
+    - protocol: TCP
+      port: 8084
+      targetPort: 0 # Puerto dinámico solicitado
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: amounts-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: amounts-service
+  template:
+    metadata:
+      labels:
+        app: amounts-service
+    spec:
+      containers:
+        - name: amounts-service
+          image: amounts-service:latest
+          imagePullPolicy: Never
+          env:
+            - name: SERVER_PORT
+              value: "0" # Asignación dinámica (Requisito Rúbrica)
+            - name: SPRING_CONFIG_IMPORT
+              value: "optional:configserver:http://config-service:8888"
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              value: "http://eureka-service:8761/eureka/"
+            # Conexión exclusiva a su base de datos (Punto 2 Rúbrica)
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:postgresql://postgres-db:5432/amountsAndFees_db"
+            - name: SPRING_DATASOURCE_USERNAME
+              value: "postgres"
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: "09282325"
